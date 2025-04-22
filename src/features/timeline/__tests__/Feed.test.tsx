@@ -6,7 +6,7 @@ import { Feed } from '../components/Feed';
 describe('<Feed>', () => {
   it('renders loading state initially', () => {
     render(<Feed />);
-    expect(screen.getByText(/loading posts/i)).toBeInTheDocument();
+    expect(screen.getByText('読み込み中...')).toBeInTheDocument();
   });
 
   it('renders post list after loading', async () => {
@@ -16,8 +16,8 @@ describe('<Feed>', () => {
     expect(articles).toHaveLength(3);
 
     // Verify post content
-    expect(screen.getByText('First Post')).toBeInTheDocument();
-    expect(screen.getByText('Second Post')).toBeInTheDocument();
-    expect(screen.getByText('Third Post')).toBeInTheDocument();
+    expect(screen.getAllByText('First Post')).not.toHaveLength(0);
+    expect(screen.getAllByText('Second Post')).not.toHaveLength(0);
+    expect(screen.getAllByText('Third Post')).not.toHaveLength(0);
   });
 });

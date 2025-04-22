@@ -5,8 +5,8 @@ AI支援型「Vibe Coding」に最適化されたフルスタックスタータ�
 ## 主な特徴
 
 - **Next.js 15**（App Router）＋ **React 19 RC**
-- **Bun**開発サーバー & `pnpm`ワークスペース
-- **厳格なTypeScript**（`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`）
+- **pnpm** 開発サーバー & ワークスペース
+- **厳格なTypeScript**
 - **Vitest v2**（ユニット・コンポーネントテスト）＋ **Playwright 1.44**（E2E）
 - **MSW 2**による共通モック
 - **ESLint v9**による厳格Lint + **Prettier 3**
@@ -18,21 +18,109 @@ AI支援型「Vibe Coding」に最適化されたフルスタックスタータ�
 
 ```bash
 pnpm i
-bun run dev           # ローカル開発サーバー（localhost:3000）
-bun run test          # vitest + API + e2e（turbo経由）
+pnpm dev           # ローカル開発サーバー（localhost:3000）
+pnpm test          # vitest + API + e2e（turbo経由）
 
 # ESLint / Prettier / ts‑prune
-bun run lint
-bun run format
-bun run check
-bun run prune
+pnpm format
+pnpm lint
+pnpm check
+pnpm prune
 ```
 
-## プロジェクト構造：縦割り（feature-slice）設計
+## DBレイヤ設計思想（Prisma対応・Vibe Coding流）
 
-このプロジェクトは「縦割り（feature-slice）構造 × 近接型定義」のアーキテクチャを採用しています。この設計はLLMにも人間にも優しく、機能単位のリファクタリングや拡張が容易です。
+本プロジェクトでは、**DBスキーマは「境界付けられたコンテキスト」として一元管理し、各featureは「操作（クエリ・ミューテーション）」のみを責務に持つ**構成を推奨します。
 
-### ディレクトリ構造
+- Prismaを使う場合の具体例：
+
+```
+project-root/
+├─ prisma/
+│   ├─ schema.prisma           # Prismaスキーマ定義
+│   └─ migrations/             # マイグレーション履歴
+├─ src/
+│   ├─ db/
+│   │   └─ client.ts           # PrismaClient初期化・export
+│   └─ features/
+│       ├─ profile/
+│       │   └─ server.ts       # profile用DB操作関数
+│       └─ post/
+│           └─ server.ts       # post用DB操作関数
+└─ .env                        # DATABASE_URLなど
+```
+
+- 各featureは`db/client.ts`経由でDB操作のみを記述し、スキーマ定義に依存します。
+
+---
+
+### Prisma用サンプル
+
+#### prisma/schema.prisma
+
+```prisma
+model Profile {
+  id        Int      @id @default(autoincrement())
+  name      String
+  bio       String?
+  createdAt DateTime @default(now())
+  posts     Post[]
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  profileId  Int
+  content    String
+  createdAt  DateTime @default(now())
+  profile    Profile  @relation(fields: [profileId], references: [id])
+}
+```
+
+#### src/db/client.ts
+
+```ts
+import { PrismaClient } from '@prisma/client';
+export const db = new PrismaClient();
+```
+
+#### src/features/profile/server.ts
+
+```ts
+import { db } from '@/db/client';
+
+export const getProfileById = (id: number) => db.profile.findUnique({ where: { id } });
+```
+
+#### src/features/post/server.ts
+
+```ts
+import { db } from '@/db/client';
+
+export const getPostsByProfile = (profileId: number) =>
+  db.post.findMany({
+    where: { profileId },
+    orderBy: { createdAt: 'desc' },
+  });
+```
+
+#### .env例
+
+```
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+```
+
+---
+
+### なぜこの構成が良いのか？
+
+1. **境界付けられたコンテキスト**：DB定義は横断的に一元管理し、各featureはそこだけ参照。
+2. **型安全性**：Prismaの型をそのままTSで活用し、AI生成コードの型エラーを激減。
+3. **LLMプロンプト簡潔化**：「prisma/schema.prismaを変更して」→影響範囲が一目瞭然。
+4. **CIキャッシュ効率化**：スキーマ変更のみでDBクライアント再ビルド、Turboキャッシュ有効。
+
+---
+
+### ディレクトリ構成（全体）
 
 #### 1. 縦割り構造のフォルダ構成
 
@@ -204,6 +292,84 @@ export default async function TimelinePage() {
   - "Move timeline under (auth), update imports."
 - **エラー境界拡張**
   - "Add a fallback UI to app/error.tsx that links to /timeline."
+
+---
+
+## Vibe CodingにおけるCSSベストプラクティス
+
+- **ゴール**: ドキュメント≤400token・局所化・AIが理解しやすいスタイル＆開発体験最適化
+
+### 1. 方針 — Utility-First + Design Tokens
+
+- Tailwind CSS中心。ユーティリティクラスのみで即時フィードバック
+- Design Token（colors, spacing, fontSize等）は`tailwind.config.js`で一元管理
+- グローバル: `app/globals.css`（reset/base/theme/dark-modeのみ）
+- 各コンポーネント: 完全ユーティリティ記述。独自クラスはshadcn/uiやclassnamesで制御
+
+### 2. 必須ツール
+
+| ツール                        | 役割                           |
+| ----------------------------- | ------------------------------ |
+| Tailwind CSS                  | Utility-Firstスタイル          |
+| PostCSS + Autoprefixer        | ベンダープレフィックス自動付与 |
+| Stylelint                     | CSS/SCSS静的解析               |
+| Prettier + plugin-tailwindcss | className自動ソート            |
+| shadcn/ui                     | デザインコンポーネント薄ラッパ |
+
+#### 設定例
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: ['./src/app/**/*.{ts,tsx}', './src/features/**/*.{ts,tsx}', './src/ui/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+      },
+      spacing: {
+        sm: '0.5rem',
+        md: '1rem',
+        lg: '2rem',
+      },
+    },
+  },
+  darkMode: 'class',
+  plugins: [],
+};
+```
+
+### 3. ファイル配置例
+
+```
+src/
+├─ app/
+│   └─ globals.css     # Tailwind base + reset + theme vars
+├─ features/
+│   └─ timeline/components/Feed.tsx
+└─ ui/
+    └─ Button.tsx     # <button className="rounded-lg px-4 py-2 bg-primary ...">
+```
+
+### 4. 運用フロー
+
+- globals.cssに`@tailwind base; @tailwind components; @tailwind utilities;`を記述
+- すべてJSX上でユーティリティクラス指定。独自クラスはshadcn/ui/`classnames`で制御
+- `pnpm lint-staged`でstylelint/prettierチェック
+
+### 5. レスポンシブ＆ダークモード
+
+- `sm:`, `md:`, `lg:`でレスポンシブ
+- `dark:`でダークモード、`<html className={theme}>`で切替
+
+### 6. AIプロンプト例
+
+- 「theme.colors.brandを追加し、Box背景に反映」
+- 「Feed.tsxのpaddingをmd:2xl→sm:mdに変更」
+- 「timeline/page.tsxにdarkモード背景色追加」
+
+---
 
 ## Vibe Coding ワークフロー
 

@@ -18,14 +18,14 @@ export type ButtonProps = {
 
 const styles = {
   primary: {
-    md: 'rounded-2xl px-4 py-2 bg-blue-600 text-white shadow-sm',
-    lg: 'rounded-2xl px-6 py-3 bg-blue-600 text-white shadow-sm',
-    sm: 'rounded-2xl px-2 py-1 bg-blue-600 text-white shadow-sm',
+    md: 'rounded-2xl px-4 py-2 bg-primary text-white shadow-sm',
+    lg: 'rounded-2xl px-6 py-3 bg-primary text-white shadow-sm',
+    sm: 'rounded-2xl px-2 py-1 bg-primary text-white shadow-sm',
   },
   secondary: {
-    md: 'rounded-2xl px-4 py-2 bg-gray-100 text-gray-900 shadow-sm',
-    lg: 'rounded-2xl px-6 py-3 bg-gray-100 text-gray-900 shadow-sm',
-    sm: 'rounded-2xl px-2 py-1 bg-gray-100 text-gray-900 shadow-sm',
+    md: 'rounded-2xl px-4 py-2 bg-secondary text-gray-900 shadow-sm',
+    lg: 'rounded-2xl px-6 py-3 bg-secondary text-gray-900 shadow-sm',
+    sm: 'rounded-2xl px-2 py-1 bg-secondary text-gray-900 shadow-sm',
   },
 } as const;
 

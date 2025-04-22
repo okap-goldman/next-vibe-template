@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    setupFiles: ['./src/setupTests.ts', './tests/setup.ts'],
+    setupFiles: ['./src/setupTests.ts'],
     coverage: { reporter: ['text', 'html'] },
   },
 });
