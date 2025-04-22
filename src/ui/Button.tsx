@@ -29,6 +29,16 @@ const styles = {
   },
 } as const;
 
+/**
+ *
+ * @param root0
+ * @param root0.children
+ * @param root0.variant
+ * @param root0.size
+ * @param root0.type
+ * @param root0.disabled
+ * @param root0.isLoading
+ */
 export const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',

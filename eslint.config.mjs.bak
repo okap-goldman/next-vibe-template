@@ -12,37 +12,10 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import jsdoc from 'eslint-plugin-jsdoc';
 // import prettier from 'eslint-config-prettier'; // prettier連携は一時停止中
 
-const tsRecommended = Array.isArray(tseslint.configs.recommended)
-  ? tseslint.configs.recommended.filter(Boolean)
-  : [tseslint.configs.recommended].filter(Boolean);
-
-const tsTypeChecking = Array.isArray(tseslint.configs.recommendedRequiringTypeChecking)
-  ? tseslint.configs.recommendedRequiringTypeChecking.filter(Boolean)
-  : [tseslint.configs.recommendedRequiringTypeChecking].filter(Boolean);
-
 export default [
-  {
-    ignores: [
-      'node_modules/',
-      '.next/',
-      'dist/',
-      'build/',
-      'out/',
-      'coverage/',
-      '*.config.js',
-      '*.config.cjs',
-      '*.config.mjs',
-      '*.rc.js',
-      '*.rc.cjs',
-      '*.rc.mjs',
-      '*.d.ts',
-      'scripts/',
-      '.env*',
-    ],
-  },
   js.configs.recommended,
-  ...tsRecommended,
-  ...tsTypeChecking,
+  ...tseslint.configs.recommended,
+  tseslint.configs.recommendedRequiringTypeChecking,
   {
     languageOptions: {
       parser: tseslint.parser,
