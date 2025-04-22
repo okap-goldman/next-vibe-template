@@ -1,0 +1,45 @@
+openapi: 3.1.0
+info:
+  title: Timeline API
+  version: 1.0.0
+paths:
+  /api/timeline:
+    get:
+      summary: タイムラインの投稿を取得
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: 次ページのカーソル
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedResponse'
+components:
+  schemas:
+    FeedItem:
+      type: object
+      properties:
+        id: { type: string }
+        text: { type: string }
+        authorId: { type: string }
+        authorName: { type: string }
+        authorAvatar: { type: string }
+        createdAt: { type: string, format: date-time }
+        likeCount: { type: integer }
+        commentCount: { type: integer }
+        isLiked: { type: boolean }
+    FeedResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeedItem'
+        nextCursor:
+          type: string
+          nullable: true

@@ -1,0 +1,46 @@
+erDiagram
+    User ||--o{ Post : "作成する"
+    User ||--o{ Comment : "作成する"
+    User ||--o{ Like : "付ける"
+    Post ||--o{ Comment : "持つ"
+    Post ||--o{ Like : "受け取る"
+    Post ||--o{ Attachment : "持つ"
+    
+    User {
+        string id PK
+        string username
+        string email
+        string profileImage
+        datetime createdAt
+    }
+    
+    Post {
+        string id PK
+        string userId FK
+        string content
+        datetime createdAt
+        boolean isPublic
+    }
+    
+    Comment {
+        string id PK
+        string postId FK
+        string userId FK
+        string content
+        datetime createdAt
+    }
+    
+    Like {
+        string id PK
+        string postId FK
+        string userId FK
+        datetime createdAt
+    }
+    
+    Attachment {
+        string id PK
+        string postId FK
+        string url
+        string type
+        datetime createdAt
+    }

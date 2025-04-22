@@ -1,0 +1,7 @@
+/**
+ * グローバルCSSファイル
+ * Tailwind CSSのディレクティブや基本的なスタイルを定義
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

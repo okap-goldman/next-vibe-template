@@ -1,0 +1,13 @@
+C4Context
+  title システムコンテキスト図
+
+  Person(user, "エンドユーザー", "アプリを利用する人")
+  System_Boundary(app, "SNSアプリ") {
+    Container(web, "Webフロントエンド", "Next.js 15, React 19", "ユーザーインターフェースを提供")
+    ContainerDb(db, "データベース", "PlanetScale MySQL", "投稿、ユーザー情報などを永続化")
+  }
+  System_Ext(payment_gw, "決済ゲートウェイ", "外部サービス")
+
+  Rel(user, web, "利用する", "HTTPS")
+  Rel(web, db, "読み書きする", "TCP/IP")
+  Rel_Back(user, payment_gw, "支払い情報入力")

@@ -1,0 +1,24 @@
+services:
+  - name: user-service
+    responsibility: 'ユーザー管理、認証、プロフィール'
+    domain_objects: ['User', 'Profile', 'Follower']
+    apis:
+      - '/api/user'
+      - '/api/user/profile'
+      - '/api/user/follow'
+
+  - name: content-service
+    responsibility: '投稿、コメント、いいねの管理'
+    domain_objects: ['Post', 'Comment', 'Like', 'Attachment']
+    apis:
+      - '/api/timeline'
+      - '/api/post'
+      - '/api/comment'
+      - '/api/like'
+
+  - name: notification-service
+    responsibility: '通知の管理と配信'
+    domain_objects: ['Notification']
+    apis:
+      - '/api/notification'
+      - '/api/notification/settings'

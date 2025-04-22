@@ -1,0 +1,34 @@
+flowchart TD
+    Start([アプリ起動]) --> Login[ログイン画面]
+    Login -->|認証成功| Home[ホーム画面]
+    Login -->|新規ユーザー| Register[ユーザー登録]
+    Register -->|登録完了| Home
+    
+    Home -->|タブ選択| Timeline[タイムライン]
+    Home -->|タブ選択| Explore[探索]
+    Home -->|タブ選択| Notifications[通知]
+    Home -->|タブ選択| Profile[プロフィール]
+    
+    Timeline -->|投稿タップ| PostDetail[投稿詳細]
+    Timeline -->|スクロール| TimelineLoad[追加投稿読込]
+    TimelineLoad --> Timeline
+    
+    PostDetail -->|コメントボタン| CommentCreate[コメント作成]
+    PostDetail -->|いいねボタン| LikeAction[いいね処理]
+    LikeAction --> PostDetail
+    CommentCreate --> PostDetail
+    
+    Explore -->|検索| SearchResults[検索結果]
+    SearchResults -->|ユーザータップ| UserProfile[ユーザープロフィール]
+    SearchResults -->|投稿タップ| PostDetail
+    
+    Profile -->|編集ボタン| ProfileEdit[プロフィール編集]
+    ProfileEdit --> Profile
+    
+    subgraph 投稿作成フロー
+    Home -->|投稿ボタン| CreatePost[投稿作成]
+    CreatePost -->|下書き保存| DraftSaved[下書き保存]
+    CreatePost -->|投稿| PostSuccess[投稿成功]
+    PostSuccess --> Timeline
+    DraftSaved -->|再開| CreatePost
+    end
