@@ -6,7 +6,7 @@ import type { JSX } from 'react';
  * 投稿の一覧を無限スクロール形式で表示する
  */
 import { useInfiniteFeed } from '../hooks/useInfiniteFeed';
-import { FeedItem } from '../types';
+import type { FeedItem } from '../types';
 
 /**
  * タイムラインフィードコンポーネント

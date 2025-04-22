@@ -5,10 +5,11 @@
 'use client';
 import Image from 'next/image';
 import type { JSX } from 'react';
-import { ChangeEvent, FormEvent, useRef, useState } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useRef, useState } from 'react';
 
 import { Button } from '../../../ui/Button';
-import { CreatePostData } from '../types';
+import type { CreatePostData } from '../types';
 
 /**
  * PostFormコンポーネントのプロパティ
@@ -100,7 +101,9 @@ export const PostForm = ({
    */
   const handleRemoveImage = (index: number): void => {
     // プレビューURL解放
-    URL.revokeObjectURL(imageUrls[index]);
+    if (imageUrls[index]) {
+      URL.revokeObjectURL(imageUrls[index]!);
+    }
 
     setImageFiles((prev: File[]) => prev.filter((_, i) => i !== index));
     setImageUrls((prev: string[]) => prev.filter((_, i) => i !== index));
@@ -122,8 +125,8 @@ export const PostForm = ({
       // そのURLをimageUrlsとして使用します
       // この例では簡略化のため、プレビューURLをそのまま使用
       const postData: CreatePostData = {
-        content: content.trim(),
-        imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
+        content,
+        imageUrls: imageUrls ?? [],
       };
 
       await onSubmit(postData);

@@ -4,7 +4,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 
-import { PostListApiResponse, PostWithUserActions } from '../types';
+import type { PostListApiResponse, PostWithUserActions } from '../types';
 
 /**
  * 投稿一覧を取得するGETリクエストハンドラー

@@ -122,7 +122,7 @@ export const post = <T>(
 ): Promise<ApiResponse<T>> => {
   return fetcher<T>(url, {
     method: 'POST',
-    body: data ? JSON.stringify(data) : undefined,
+    body: data ? JSON.stringify(data) : null,
     ...options,
   });
 };
@@ -141,7 +141,7 @@ export const put = <T>(
 ): Promise<ApiResponse<T>> => {
   return fetcher<T>(url, {
     method: 'PUT',
-    body: data ? JSON.stringify(data) : undefined,
+    body: data ? JSON.stringify(data) : null,
     ...options,
   });
 };

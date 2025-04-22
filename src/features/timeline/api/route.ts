@@ -4,7 +4,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 
-import { FeedResponse } from '../types';
+import type { FeedResponse } from '../types';
 
 /**
  * タイムラインデータを取得するGETリクエストハンドラー

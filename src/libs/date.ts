@@ -65,5 +65,5 @@ export const isToday = (date: string | Date): boolean => {
  */
 export const formatISODateToYYYYMMDD = (isoString: string): string => {
   const date = new Date(isoString);
-  return date.toISOString().split('T')[0];
+  return date?.toISOString?.()?.split?.('T')[0] ?? '';
 };

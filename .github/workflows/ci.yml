@@ -10,23 +10,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Bunセットアップ（bun runなどのため）
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.30
-      - name: Install
-        run: bun install --frozen-lockfile
+
+      # pnpmセットアップ
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8.15.5
+
+      # 依存インストールはpnpmで
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Turboキャッシュ
       - name: Cache Turbo
         uses: actions/cache@v4
         with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ hashFiles('**/lockfile*') }}
+
+      # Lint & Format
       - name: Lint & Format
         run: bun run lint && bun run format --check
+
+      # Type Check
       - name: Type Check
         run: bunx tsc --noEmit
+
+      # Unit and Component Tests
       - name: Unit and Component Tests
         run: bun run test:unit
+
+      # API Tests
       - name: API Tests
         run: bun run test:api
+
+      # E2E Tests (Playwright)
       - name: E2E Tests
         run: xvfb-run --auto-servernum --server-num=1 bun run test:e2e

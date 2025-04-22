@@ -8,7 +8,7 @@ import type { JSX } from 'react';
 import { useState } from 'react';
 
 import { timeAgo } from '../../../libs/date';
-import { PostWithUserActions } from '../types';
+import type { PostWithUserActions } from '../types';
 
 /**
  * PostCardコンポーネントのプロパティ
@@ -140,7 +140,7 @@ export const PostCard = ({
             onClick={handleImageClick}
           >
             <Image
-              src={post.imageUrls[0]}
+              src={post.imageUrls[0] ?? ''}
               alt="投稿画像"
               fill
               className={`${isImageExpanded ? 'max-h-screen max-w-full object-contain' : 'w-full h-auto object-cover'}`}

@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { get, post } from '../../../libs/fetcher';
-import { PostWithUserActions, UsePostOptions, UsePostResult } from '../types';
+import type { PostWithUserActions, UsePostOptions, UsePostResult } from '../types';
 
 /**
  * 単一の投稿を取得・操作するカスタムフック

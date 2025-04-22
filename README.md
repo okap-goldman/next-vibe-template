@@ -1,27 +1,25 @@
-# Next.js 15 + React 19 Vibe Coding Template
+# Next.js 15 + React 19 Vibe Coding テンプレート
 
-**Generated:** 2025-04-21
+AI支援型「Vibe Coding」に最適化されたフルスタックスターター🚀
 
-Full‑stack starter optimized for AI‑assisted "Vibe Coding".
+## 主な特徴
 
-## Highlights
+- **Next.js 15**（App Router）＋ **React 19 RC**
+- **Bun**開発サーバー & `pnpm`ワークスペース
+- **厳格なTypeScript**（`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`）
+- **Vitest v2**（ユニット・コンポーネントテスト）＋ **Playwright 1.44**（E2E）
+- **MSW 2**による共通モック
+- **ESLint v9**による厳格Lint + **Prettier 3**
+- **commitlint v19**、Conventional Commits、Huskyフック、lint‑staged
+- **TurboRepo**によるキャッシュ付き並列タスク
+- GitHub Actions CIワークフロー
 
-- **Next.js 15** (App Router) + **React 19 RC**
-- **Bun** dev server & `pnpm` workspace
-- **Strict TypeScript** (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`)
-- **Vitest v2** (unit / component) + **Playwright 1.44** (E2E)
-- **MSW 2** shared mocks
-- **ESLint v9** strict config + **Prettier 3**
-- **commitlint v19**, Conventional Commits, Husky hooks, lint‑staged
-- **TurboRepo** for cached parallel tasks
-- GitHub Actions CI workflow
-
-## Quick Start
+## クイックスタート
 
 ```bash
 pnpm i
-bun run dev           # localhost:3000
-bun run test          # vitest + api + e2e via turbo
+bun run dev           # ローカル開発サーバー（localhost:3000）
+bun run test          # vitest + API + e2e（turbo経由）
 
 # ESLint / Prettier / ts‑prune
 bun run lint
@@ -283,25 +281,6 @@ export default async function TimelinePage() {
 ```
 
 すべて git で履歴に残り、以降は通常の Vibe 開発ループ（lint → test → PR）へ。
-
-⸻
-
-📋 **"ロードマップ進捗シート" テンプレ**
-
-```markdown
-- [ ] 0 Vision sentence
-- [ ] 1 Personas
-- [ ] 2 Epics & Stories
-- [ ] 3 NFR
-- [ ] 4 Glossary
-      ...
-- [ ] 17 MSW mocks
-- [ ] 18 First Vibe prompt
-```
-
-Issue テンプレや Notion に貼れば、誰がどこまで終えたか一目瞭然です。
-
-⸻
 
 ✅ **まとめ**
 

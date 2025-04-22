@@ -5,7 +5,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { get } from '../../../libs/fetcher';
-import { FeedItem, FeedResponse, UseInfiniteFeedOptions, UseInfiniteFeedResult } from '../types';
+import type {
+  FeedItem,
+  FeedResponse,
+  UseInfiniteFeedOptions,
+  UseInfiniteFeedResult,
+} from '../types';
 
 /**
  * タイムラインの無限スクロールを管理するカスタムフック
