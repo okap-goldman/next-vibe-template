@@ -2,3 +2,5 @@
 *lock.yaml
 node_modules
 .git
+.turbo
+.next

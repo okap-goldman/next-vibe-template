@@ -26,6 +26,7 @@ bun run test          # vitest + api + e2e via turbo
 # ESLint / Prettier / ts‑prune
 bun run lint
 bun run format
+bun run check
 bun run prune
 ```
 
