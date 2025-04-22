@@ -21,16 +21,20 @@ export const GET = async (request: NextRequest): Promise<NextResponse> => {
 
     // ここでは仮のデータを返しますが、実際の実装では
     // データベースやAPI呼び出しを行います
+    const HOUR_MS = 3600000;
+    const MAX_COMMENTS = 20;
+    const LIKED_THRESHOLD = 0.5;
+
     const mockData: FeedResponse = {
       items: Array.from({ length: limit }, (_, i) => ({
         id: `post-${cursor ? parseInt(cursor) + i : i}`,
         content: `これはサンプル投稿です。#${cursor ? parseInt(cursor) + i : i}`,
         authorId: `user-${(i % 3) + 1}`,
         authorName: `ユーザー${(i % 3) + 1}`,
-        createdAt: new Date(Date.now() - i * 3600000).toISOString(),
+        createdAt: new Date(Date.now() - i * HOUR_MS).toISOString(),
         likes: Math.floor(Math.random() * 100),
-        commentCount: Math.floor(Math.random() * 20),
-        isLiked: Math.random() > 0.5,
+        commentCount: Math.floor(Math.random() * MAX_COMMENTS),
+        isLiked: Math.random() > LIKED_THRESHOLD,
       })),
       nextCursor: cursor ? String(parseInt(cursor) + limit) : String(limit),
       hasMore: true,

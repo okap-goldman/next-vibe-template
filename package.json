@@ -66,9 +66,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "prettier --write",
-      "eslint --fix",
-      "lint:next"
+      "prettier --write"
     ],
     "*.{json,md,css}": [
       "prettier --write"

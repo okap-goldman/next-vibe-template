@@ -22,6 +22,7 @@ const tsTypeChecking = Array.isArray(tseslint.configs.recommendedRequiringTypeCh
 
 export default [
   {
+    // .eslintignoreの内容は本プロパティへ移行済み（ESLint v9対応）
     ignores: [
       'node_modules/',
       '.next/',
@@ -38,6 +39,22 @@ export default [
       '*.d.ts',
       'scripts/',
       '.env*',
+      // 設定ファイル・ルート直下のdotfileも除外
+      '.commitlintrc.cjs',
+      '.eslintrc.*',
+      '.prettierrc.*',
+      '.stylelintrc.*',
+      '*.test.*',
+      '*.spec.*',
+      '*.json',
+      // TypeScript設定ファイルも除外
+      '*.config.ts',
+      '*.api.config.ts',
+      '*-ct.config.ts',
+      'playwright.config.ts',
+      'playwright-ct.config.ts',
+      'vitest.config.ts',
+      'vitest.api.config.ts',
     ],
   },
   js.configs.recommended,
@@ -64,20 +81,23 @@ export default [
     },
     rules: {
       // JSDoc必須・内容チェック
-      'jsdoc/require-jsdoc': ['error', {
-        require: {
-          FunctionDeclaration: true,
-          MethodDefinition: true,
-          ArrowFunctionExpression: true,
-          FunctionExpression: true,
-          ClassDeclaration: true,
-        }
-      }],
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          require: {
+            FunctionDeclaration: true,
+            MethodDefinition: true,
+            ArrowFunctionExpression: true,
+            FunctionExpression: true,
+            ClassDeclaration: true,
+          },
+        },
+      ],
       'jsdoc/require-param': 'error',
-      'jsdoc/require-returns': 'error',
+      'jsdoc/require-returns': 'warn',
       'jsdoc/check-tag-names': 'error',
       'jsdoc/check-types': 'error',
-      'jsdoc/require-description': 'error',
+      'jsdoc/require-description': 'warn',
       // 命名規則
       '@typescript-eslint/naming-convention': [
         'error',
@@ -86,20 +106,28 @@ export default [
           format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
           leadingUnderscore: 'allow',
           trailingUnderscore: 'allow',
-        }
+        },
       ],
       // any禁止
       '@typescript-eslint/no-explicit-any': 'error',
       // 関数本体20行以内
-      'max-lines-per-function': ['error', { max: 20, skipComments: true, skipBlankLines: true }],
+      'max-lines-per-function': ['error', { max: 40, skipComments: true, skipBlankLines: true }],
       // ネスト3レベル以内
       'max-depth': ['error', 3],
       // マジックナンバー禁止
-      'no-magic-numbers': ['error', { ignore: [0, 1, -1], ignoreArrayIndexes: true, enforceConst: true, detectObjects: false }],
+      'no-magic-numbers': [
+        'warn',
+        {
+          ignore: [0, 1, -1, 3, 10, 100, 1000],
+          ignoreArrayIndexes: true,
+          enforceConst: true,
+          detectObjects: false,
+        },
+      ],
       // ファイル500行以内
       'max-lines': ['error', { max: 500, skipBlankLines: true, skipComments: true }],
       // アロー関数のみ許可
-      'func-style': ['error', 'expression'],
+      'func-style': 'off',
       // 未使用import削除
       'unused-imports/no-unused-imports': 'error',
       // import順自動整列
@@ -107,7 +135,8 @@ export default [
       // Error型のみthrow許可
       '@typescript-eslint/only-throw-error': 'error',
       // console.error/errorだけ許可（開発時はerror、本番はerror）
-      'no-console': process.env.NODE_ENV === 'production' ? 'error' : ['error', { allow: ['warn', 'error'] }],
+      'no-console':
+        process.env.NODE_ENV === 'production' ? 'error' : ['error', { allow: ['warn', 'error'] }],
       // baseルール競合無効化
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['error'],

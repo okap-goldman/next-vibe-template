@@ -30,14 +30,16 @@ const styles = {
 } as const;
 
 /**
+ * 汎用的なボタンコンポーネント。
  *
- * @param root0
- * @param root0.children
- * @param root0.variant
- * @param root0.size
- * @param root0.type
- * @param root0.disabled
- * @param root0.isLoading
+ * @param root0 - ボタンのprops
+ * @param root0.children - ボタン内部の要素
+ * @param root0.variant - バリアント種別
+ * @param root0.size - サイズ種別
+ * @param root0.type - ボタンタイプ
+ * @param root0.disabled - 非活性フラグ
+ * @param root0.isLoading - ローディング状態
+ * @returns ボタン要素
  */
 export const Button: React.FC<ButtonProps> = ({
   children,

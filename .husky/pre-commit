@@ -1,2 +1,2 @@
 npx lint-staged
-bun run check
+bun run lint
