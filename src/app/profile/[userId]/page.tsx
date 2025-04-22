@@ -6,17 +6,18 @@ import type { JSX } from 'react';
 // import { UserProfile } from '@/src/features/profile'; // 仮
 // import { getUserProfile } from '@/src/features/profile/server'; // 仮
 
-type ProfilePageProps = {
-  params: { userId: string };
-};
-
 /**
- * プロフィールページ (Server Component)
- * @param {ProfilePageProps} props - プロパティ（URLパラメータを含む）
+ * ユーザープロフィールページのコンポーネント
+ * @param {object} props - Next.jsのページプロパティ
+ * @param {object} props.params - URLパラメータ
+ * @param {string} props.params.userId - ユーザーID
  * @returns {Promise<JSX.Element>} プロフィールページの要素
  */
-const ProfilePage = async ({ params }: ProfilePageProps): Promise<JSX.Element> => {
-  const { userId } = params;
+const ProfilePage = async (props: {
+  params: Promise<{ userId: string }>;
+}): Promise<JSX.Element> => {
+  const { userId } = await props.params;
+
   // const userProfile = await getUserProfile(userId); // データ取得はfeatureに委譲
 
   return (
