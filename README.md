@@ -19,7 +19,7 @@ Full‑stack starter optimized for AI‑assisted "Vibe Coding".
 ## Quick Start
 
 ```bash
-pnpm i                # or bun i
+pnpm i
 bun run dev           # localhost:3000
 bun run test          # vitest + api + e2e via turbo
 
