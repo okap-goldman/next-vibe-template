@@ -1,7 +1,14 @@
-/**
- * グローバルCSSファイル
- * Tailwind CSSのディレクティブや基本的なスタイルを定義
- */
+/* グローバルCSSファイル: Tailwindディレクティブ＋テーマ変数＋ダークモード */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-primary: #1a73e8;
+  --color-secondary: #f9ab00;
+}
+
+html.dark {
+  --color-primary: #2563eb; /* ダーク時のプライマリ例 */
+  --color-secondary: #fbbf24;
+}

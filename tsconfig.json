@@ -35,5 +35,27 @@
     ]
   },
   "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "*.js",
+    "*.cjs",
+    "*.mjs",
+    "*.config.*",
+    "*.rc.*",
+    "*.d.ts",
+    "scripts/",
+    "*.json",
+    ".commitlintrc.cjs",
+    ".eslintrc.*",
+    ".prettierrc.*",
+    ".stylelintrc.*",
+    // TypeScript設定ファイルも除外
+    "*.config.ts",
+    "*.api.config.ts",
+    "*-ct.config.ts",
+    "playwright.config.ts",
+    "playwright-ct.config.ts",
+    "vitest.config.ts",
+    "vitest.api.config.ts"
+  ]
 }

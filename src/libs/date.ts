@@ -27,18 +27,24 @@ export const timeAgo = (date: string | Date): string => {
   const now = new Date();
   const diff = Math.floor((now.getTime() - d.getTime()) / 1000);
 
-  if (diff < 60) {
+  const MINUTE = 60;
+  const HOUR = 3600;
+  const DAY = 86400;
+  const MONTH = 2592000;
+  const YEAR = 31536000;
+
+  if (diff < MINUTE) {
     return `${diff}秒前`;
-  } else if (diff < 3600) {
-    return `${Math.floor(diff / 60)}分前`;
-  } else if (diff < 86400) {
-    return `${Math.floor(diff / 3600)}時間前`;
-  } else if (diff < 2592000) {
-    return `${Math.floor(diff / 86400)}日前`;
-  } else if (diff < 31536000) {
-    return `${Math.floor(diff / 2592000)}ヶ月前`;
+  } else if (diff < HOUR) {
+    return `${Math.floor(diff / MINUTE)}分前`;
+  } else if (diff < DAY) {
+    return `${Math.floor(diff / HOUR)}時間前`;
+  } else if (diff < MONTH) {
+    return `${Math.floor(diff / DAY)}日前`;
+  } else if (diff < YEAR) {
+    return `${Math.floor(diff / MONTH)}ヶ月前`;
   } else {
-    return `${Math.floor(diff / 31536000)}年前`;
+    return `${Math.floor(diff / YEAR)}年前`;
   }
 };
 

@@ -3,16 +3,12 @@
  * 単一の投稿情報を表示するカードUI
  */
 'use client';
-import Image from 'next/image'; // Add import
+// Add import
 import type { JSX } from 'react';
 import { useState } from 'react';
 
-import { timeAgo } from '../../../libs/date';
 import type { PostWithUserActions } from '../types';
 
-/**
- * PostCardコンポーネントのプロパティ
- */
 export interface PostCardProps {
   /**
    * 表示する投稿データ
@@ -41,8 +37,152 @@ export interface PostCardProps {
 }
 
 /**
+ * 投稿カード用のハンドラ群をまとめるカスタムフック
+ * @param {PostWithUserActions} post - 投稿データ
+ * @param {(id: string) => void} [onLikeClick] - いいねハンドラ
+ * @param {(id: string) => void} [onCommentClick] - コメントハンドラ
+ * @param {(id: string) => void} [onShareClick] - シェアハンドラ
+ * @param {(id: string) => void} [onPostClick] - 投稿クリックハンドラ
+ * @returns {PostCardHandlers} 各種ハンドラと状態
+ */
+interface PostCardHandlers {
+  isImageExpanded: boolean;
+  handleLikeClick: () => void;
+  handleCommentClick: (e: React.MouseEvent) => void;
+  handleShareClick: (e: React.MouseEvent) => void;
+  handlePostClick: () => void;
+  handleImageClick: (e: React.MouseEvent) => void;
+}
+
+/**
+ * 投稿カードの各種イベントハンドラをまとめて生成するカスタムフック。
+ *
+ * @param post - 投稿データ
+ * @param onLikeClick - いいねクリック時のコールバック
+ * @param onCommentClick - コメントクリック時のコールバック
+ * @param onShareClick - シェアクリック時のコールバック
+ * @param onPostClick - 投稿クリック時のコールバック
+ * @returns 投稿カード用ハンドラ群
+ */
+/**
+ * 投稿カードの各種ハンドラと状態を生成するカスタムフック
+ * @param post 投稿データ
+ * @param onLikeClick いいねハンドラ
+ * @param onCommentClick コメントハンドラ
+ * @param onShareClick シェアハンドラ
+ * @param onPostClick 投稿クリックハンドラ
+ * @returns {PostCardHandlers} 投稿カードのハンドラ群と状態
+ */
+import { useCallback } from 'react';
+
+/**
+ * 投稿の「いいね」クリックイベントハンドラを生成するファクトリ関数。
+ *
+ * @param post - 投稿データ
+ * @param onLikeClick - いいねクリック時のコールバック
+ * @returns クリックイベントハンドラ
+ */
+const handleLikeClickFactory = (post: PostWithUserActions, onLikeClick?: (id: string) => void) =>
+  useCallback(() => {
+    onLikeClick?.(post.id);
+  }, [onLikeClick, post.id]);
+
+/**
+ * 投稿の「コメント」クリックイベントハンドラを生成するファクトリ関数。
+ *
+ * @param post - 投稿データ
+ * @param onCommentClick - コメントクリック時のコールバック
+ * @returns クリックイベントハンドラ
+ */
+const handleCommentClickFactory = (
+  post: PostWithUserActions,
+  onCommentClick?: (id: string) => void,
+) =>
+  useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onCommentClick?.(post.id);
+    },
+    [onCommentClick, post.id],
+  );
+
+/**
+ * 投稿の「シェア」クリックイベントハンドラを生成するファクトリ関数。
+ *
+ * @param post - 投稿データ
+ * @param onShareClick - シェアクリック時のコールバック
+ * @returns クリックイベントハンドラ
+ */
+const handleShareClickFactory = (post: PostWithUserActions, onShareClick?: (id: string) => void) =>
+  useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onShareClick?.(post.id);
+    },
+    [onShareClick, post.id],
+  );
+
+/**
+ * 投稿の「投稿本体」クリックイベントハンドラを生成するファクトリ関数。
+ *
+ * @param post - 投稿データ
+ * @param onPostClick - 投稿クリック時のコールバック
+ * @returns クリックイベントハンドラ
+ */
+const handlePostClickFactory = (post: PostWithUserActions, onPostClick?: (id: string) => void) =>
+  useCallback(() => {
+    onPostClick?.(post.id);
+  }, [onPostClick, post.id]);
+
+/**
+ * 投稿画像の拡大・縮小トグル用クリックハンドラを生成するファクトリ関数。
+ *
+ * @param setIsImageExpanded - 画像拡大状態のsetter
+ * @returns クリックイベントハンドラ
+ */
+const handleImageClickFactory = (
+  setIsImageExpanded: React.Dispatch<React.SetStateAction<boolean>>,
+) =>
+  useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIsImageExpanded((prev) => !prev);
+    },
+    [setIsImageExpanded],
+  );
+
+/**
+ * 投稿カードの各種イベントハンドラをまとめて生成するカスタムフック。
+ *
+ * @param post - 投稿データ
+ * @param onLikeClick - いいねクリック時のコールバック
+ * @param onCommentClick - コメントクリック時のコールバック
+ * @param onShareClick - シェアクリック時のコールバック
+ * @param onPostClick - 投稿クリック時のコールバック
+ * @returns 投稿カード用ハンドラ群
+ */
+const usePostCardHandlers = (
+  post: PostWithUserActions,
+  onLikeClick?: (id: string) => void,
+  onCommentClick?: (id: string) => void,
+  onShareClick?: (id: string) => void,
+  onPostClick?: (id: string) => void,
+): PostCardHandlers => {
+  const [isImageExpanded, setIsImageExpanded] = useState(false);
+
+  return {
+    isImageExpanded,
+    handleLikeClick: handleLikeClickFactory(post, onLikeClick),
+    handleCommentClick: handleCommentClickFactory(post, onCommentClick),
+    handleShareClick: handleShareClickFactory(post, onShareClick),
+    handlePostClick: handlePostClickFactory(post, onPostClick),
+    handleImageClick: handleImageClickFactory(setIsImageExpanded),
+  };
+};
+
+/**
  * 投稿カードコンポーネント
- * @param {PostCardProps} props - コンポーネントのプロパティ
+ * @param {PostCardProps} props - 投稿カードのプロパティ
  * @returns {JSX.Element} 投稿カード要素
  */
 export const PostCard = ({
@@ -52,140 +192,390 @@ export const PostCard = ({
   onShareClick,
   onPostClick,
 }: PostCardProps): JSX.Element => {
-  const [isImageExpanded, setIsImageExpanded] = useState<boolean>(false);
+  const handlers = usePostCardHandlers(
+    post,
+    onLikeClick,
+    onCommentClick,
+    onShareClick,
+    onPostClick,
+  );
+  return <PostCardMainLayout post={post} {...handlers} />;
+};
 
-  /**
-   * いいねボタンのクリックハンドラー
-   */
-  const handleLikeClick = (): void => {
-    if (onLikeClick) {
-      onLikeClick(post.id);
-    }
-  };
+/**
+ * 投稿カードのレイアウト本体
+ * @param {PostCardMainLayoutProps} props - レイアウトプロパティ
+ * @returns {JSX.Element} レイアウト要素
+ */
+interface PostCardMainLayoutProps {
+  post: PostWithUserActions;
+  isImageExpanded: boolean;
+  handleLikeClick: (e: React.MouseEvent) => void;
+  handleCommentClick: (e: React.MouseEvent) => void;
+  handleShareClick: (e: React.MouseEvent) => void;
+  handlePostClick: (e: React.MouseEvent) => void;
+  handleImageClick: (e: React.MouseEvent) => void;
+}
 
-  /**
-   * コメントボタンのクリックハンドラー
-   */
-  const handleCommentClick = (): void => {
-    if (onCommentClick) {
-      onCommentClick(post.id);
-    }
-  };
+/**
+ * 投稿カードのメインレイアウト
+ * @param {PostCardMainLayoutProps} props
+ * @returns {JSX.Element} 投稿カード要素
+ */
+/**
+ * 投稿カードのメインレイアウトコンポーネント
+ * @param props レイアウトプロパティ
+ * @param props.post
+ * @param props.isImageExpanded
+ * @param props.handleLikeClick
+ * @param props.handleCommentClick
+ * @param props.handleShareClick
+ * @param props.handlePostClick
+ * @param props.handleImageClick
+ * @returns {JSX.Element} 投稿カード要素
+ */
+const PostCardMainLayout = ({
+  post,
+  isImageExpanded,
+  handleLikeClick,
+  handleCommentClick,
+  handleShareClick,
+  handlePostClick,
+  handleImageClick,
+}: PostCardMainLayoutProps): JSX.Element => (
+  <article
+    className="bg-white rounded-lg shadow-sm p-4 mb-4 cursor-pointer hover:shadow-md transition-shadow"
+    onClick={handlePostClick}
+  >
+    <PostCardArticleBody
+      post={post}
+      isImageExpanded={isImageExpanded}
+      handleImageClick={handleImageClick}
+    />
+    <PostCardArticleActions
+      post={post}
+      handleLikeClick={handleLikeClick}
+      handleCommentClick={handleCommentClick}
+      handleShareClick={handleShareClick}
+    />
+  </article>
+);
 
-  /**
-   * シェアボタンのクリックハンドラー
-   */
-  const handleShareClick = (): void => {
-    if (onShareClick) {
-      onShareClick(post.id);
-    }
-  };
+/**
+ * 投稿カードの本文表示部
+ * @param {PostCardArticleBodyProps} props
+ * @returns {JSX.Element} 本文要素
+ */
+interface PostCardArticleBodyProps {
+  post: PostWithUserActions;
+  isImageExpanded: boolean;
+  handleImageClick: (e: React.MouseEvent) => void;
+}
 
-  /**
-   * 投稿カードのクリックハンドラー
-   */
-  const handlePostClick = (): void => {
-    if (onPostClick) {
-      onPostClick(post.id);
-    }
-  };
+/**
+ * 投稿カードの本文表示部
+ * @param {PostCardArticleBodyProps} props
+ * @returns {JSX.Element} 本文要素
+ */
+/**
+ * 投稿カードの本文表示部コンポーネント
+ * @param props 本文表示プロパティ
+ * @param props.post
+ * @param props.isImageExpanded
+ * @param props.handleImageClick
+ * @returns {JSX.Element} 本文要素
+ */
+const PostCardArticleBody = ({
+  post,
+  isImageExpanded,
+  handleImageClick,
+}: PostCardArticleBodyProps): JSX.Element => (
+  <PostCardBody post={post} isImageExpanded={isImageExpanded} handleImageClick={handleImageClick} />
+);
 
-  /**
-   * 画像クリックのハンドラー
-   * @param {React.MouseEvent} e - クリックイベント
-   */
-  const handleImageClick = (e: React.MouseEvent): void => {
-    e.stopPropagation(); // 親要素へのクリックイベントの伝播を防止
-    setIsImageExpanded(!isImageExpanded);
-  };
+/**
+ * 投稿カードの本文（テキスト・画像）
+ * @param {PostCardBodyProps} props
+ * @returns {JSX.Element} 本文要素
+ */
+interface PostCardBodyProps {
+  post: PostWithUserActions;
+  isImageExpanded: boolean;
+  handleImageClick: (e: React.MouseEvent) => void;
+}
 
+/**
+ * 投稿カードの本文（テキスト・画像）
+ * @param {PostCardBodyProps} props
+ * @returns {JSX.Element} 本文要素
+ */
+/**
+ * 投稿カードの本文（テキスト・画像）コンポーネント
+ * @param props 本文プロパティ
+ * @param props.post
+ * @param props.isImageExpanded
+ * @param props.handleImageClick
+ * @returns {JSX.Element} 本文要素
+ */
+const PostCardBody = ({
+  post,
+  isImageExpanded,
+  handleImageClick,
+}: PostCardBodyProps): JSX.Element => {
+  const { content, imageUrls } = post;
   return (
-    <article
-      className="bg-white rounded-lg shadow-sm p-4 mb-4 cursor-pointer hover:shadow-md transition-shadow"
-      onClick={handlePostClick}
-    >
-      {/* 投稿ヘッダー */}
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mr-3">
-            {/* ユーザーアイコンの代替表示 */}
-            <span className="text-gray-500 text-sm">{post.authorName.charAt(0).toUpperCase()}</span>
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900">{post.authorName}</h3>
-            <p className="text-xs text-gray-500">{timeAgo(post.createdAt)}</p>
-          </div>
-        </div>
-
-        {/* 投稿メニュー（省略） */}
-        <button className="text-gray-400 hover:text-gray-600">
-          <span>⋯</span>
-        </button>
-      </div>
-
-      {/* 投稿コンテンツ */}
-      <div className="mb-4">
-        <p className="text-gray-800 whitespace-pre-line">{post.content}</p>
-      </div>
-
-      {/* 投稿画像（ある場合） */}
-      {post.imageUrls && post.imageUrls.length > 0 && (
-        <div className="mb-4">
-          <div
-            className={`relative rounded-lg overflow-hidden cursor-zoom-in ${
-              isImageExpanded
-                ? 'fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4'
-                : ''
-            }`}
-            onClick={handleImageClick}
-          >
-            <Image
-              src={post.imageUrls[0] ?? ''}
-              alt="投稿画像"
-              fill
-              className={`${isImageExpanded ? 'max-h-screen max-w-full object-contain' : 'w-full h-auto object-cover'}`}
-            />
-            {post.imageUrls.length > 1 && !isImageExpanded && (
-              <div className="absolute bottom-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-full">
-                +{post.imageUrls.length - 1}
-              </div>
-            )}
-          </div>
-        </div>
+    <div>
+      <div className="mb-2 text-gray-800 text-base whitespace-pre-line break-words">{content}</div>
+      {imageUrls && imageUrls.length > 0 && (
+        <PostCardBodyImage
+          imageUrl={imageUrls[0] as string}
+          isImageExpanded={isImageExpanded}
+          handleImageClick={handleImageClick}
+        />
       )}
-
-      {/* いいね・コメント数 */}
-      <div className="flex justify-between text-xs text-gray-500 mb-3">
-        <div>{post.likes > 0 ? `${post.likes}件のいいね` : ''}</div>
-        <div>{post.commentCount > 0 ? `コメント${post.commentCount}件` : ''}</div>
+      <div className="flex justify-between text-xs text-gray-500 mt-2">
+        <span>♥ {post.likes}</span>
+        <span>💬 {post.commentCount}</span>
       </div>
-
-      {/* アクションボタン */}
-      <div className="flex border-t border-gray-100 pt-3">
-        <button
-          className={`flex-1 flex items-center justify-center py-1 ${post.isLiked ? 'text-pink-500' : 'text-gray-500'} hover:bg-gray-50 rounded-md`}
-          onClick={handleLikeClick}
-        >
-          <span className="mr-1">{post.isLiked ? '❤️' : '🤍'}</span>
-          <span>いいね</span>
-        </button>
-
-        <button
-          className="flex-1 flex items-center justify-center py-1 text-gray-500 hover:bg-gray-50 rounded-md"
-          onClick={handleCommentClick}
-        >
-          <span className="mr-1">💬</span>
-          <span>コメント</span>
-        </button>
-
-        <button
-          className="flex-1 flex items-center justify-center py-1 text-gray-500 hover:bg-gray-50 rounded-md"
-          onClick={handleShareClick}
-        >
-          <span className="mr-1">🔄</span>
-          <span>シェア</span>
-        </button>
-      </div>
-    </article>
+    </div>
   );
 };
+
+/**
+ * 投稿カードの画像表示（分割用）
+ * @param {string} imageUrl
+ * @param {boolean} isImageExpanded
+ * @param {Function} handleImageClick
+ * @returns {JSX.Element}
+ */
+const PostCardBodyImage = ({
+  imageUrl,
+  isImageExpanded,
+  handleImageClick,
+}: {
+  imageUrl: string;
+  isImageExpanded: boolean;
+  handleImageClick: (e: React.MouseEvent) => void;
+}): JSX.Element => (
+  <div className="mt-2">
+    <img
+      src={imageUrl}
+      alt="投稿画像"
+      className={isImageExpanded ? 'w-full h-auto object-contain' : 'w-full h-48 object-cover'}
+      onClick={handleImageClick}
+      style={{ cursor: 'pointer' }}
+    />
+  </div>
+);
+
+/**
+ * 投稿カードのアクション部（いいね・コメント・シェア）
+ * @param {object} props
+ * @param {PostWithUserActions} props.post - 投稿データ
+ * @param {Function} props.handleLikeClick - いいねハンドラ
+ * @param {Function} props.handleCommentClick - コメントハンドラ
+ * @param {Function} props.handleShareClick - シェアハンドラ
+ * @returns {JSX.Element} アクション要素
+ */
+/**
+ * 投稿カードのアクション部（いいね・コメント・シェア）コンポーネント
+ * @param props アクションプロパティ
+ * @param props.post
+ * @param props.handleLikeClick
+ * @param props.handleCommentClick
+ * @param props.handleShareClick
+ * @returns {JSX.Element} アクション要素
+ */
+const PostCardArticleActions = ({
+  post,
+  handleLikeClick,
+  handleCommentClick,
+  handleShareClick,
+}: {
+  post: PostWithUserActions;
+  handleLikeClick: (e: React.MouseEvent<Element, MouseEvent>) => void;
+  handleCommentClick: (e: React.MouseEvent<Element, MouseEvent>) => void;
+  handleShareClick: (e: React.MouseEvent<Element, MouseEvent>) => void;
+}): JSX.Element => (
+  <PostCardActions
+    isLiked={post.isLiked}
+    handleLikeClick={handleLikeClick}
+    handleCommentClick={handleCommentClick}
+    handleShareClick={handleShareClick}
+  />
+);
+
+/**
+ * 投稿カードの画像表示部
+ * @param {object} props
+ * @param {string} props.imageUrl - 画像URL
+ * @param {boolean} props.isImageExpanded - 画像拡大状態
+ * @param {Function} props.handleImageClick - 画像クリックハンドラ
+ * @param {number} props.extraCount - 追加枚数
+ * @param {boolean} props.showExtra - 追加枚数表示フラグ
+ * @returns {JSX.Element} 画像要素
+ */
+
+/**
+ * 画像の追加枚数バッジ
+ * @param {object} props
+ * @param {boolean} props.showExtra - 追加枚数表示フラグ
+ * @param {number} props.extraCount - 追加枚数
+ * @returns {JSX.Element|null}
+ */
+
+/**
+ * いいね数表示
+ * @param {object} props
+ * @param {number} props.likes - いいね数
+ * @returns {JSX.Element} いいね数要素
+ */
+
+/**
+ * 投稿カードのメニュー（オプション）
+ * @returns {JSX.Element} メニュー要素
+ */
+
+/**
+ *
+ * @param root0
+ * @param root0.isLiked
+ * @param root0.handleLikeClick
+ * @param root0.handleCommentClick
+ * @param root0.handleShareClick
+ */
+/**
+ * 投稿カードのアクションボタン群コンポーネント
+ * @param props アクションボタン群プロパティ
+ * @param props.isLiked
+ * @param props.handleLikeClick
+ * @param props.handleCommentClick
+ * @param props.handleShareClick
+ * @returns {JSX.Element} アクションボタン群要素
+ */
+const PostCardActions = ({
+  isLiked,
+  handleLikeClick,
+  handleCommentClick,
+  handleShareClick,
+}: {
+  isLiked: boolean;
+  handleLikeClick: (e: React.MouseEvent) => void;
+  handleCommentClick: (e: React.MouseEvent) => void;
+  handleShareClick: (e: React.MouseEvent) => void;
+}): JSX.Element => (
+  <div className="flex border-t border-gray-100 pt-3">
+    <PostCardLikeButton active={isLiked} onClick={handleLikeClick} />
+    <PostCardCommentButton onClick={handleCommentClick} />
+    <PostCardShareButton onClick={handleShareClick} />
+  </div>
+);
+
+/**
+ * いいねボタン
+ * @param {object} props
+ * @param {boolean} props.active - いいね状態
+ * @param {Function} props.onClick - クリックハンドラ
+ * @returns {JSX.Element} いいねボタン要素
+ */
+/**
+ * 投稿カードの「いいね」ボタンコンポーネント
+ * @param props ボタンプロパティ
+ * @param props.active
+ * @param props.onClick
+ * @returns {JSX.Element} いいねボタン要素
+ */
+const PostCardLikeButton = ({
+  active,
+  onClick,
+}: {
+  active: boolean;
+  onClick: (e: React.MouseEvent) => void;
+}): JSX.Element => (
+  <PostCardActionButton
+    active={active}
+    onClick={onClick}
+    icon={active ? '❤️' : '🤍'}
+    label="いいね"
+  />
+);
+
+/**
+ * コメントボタン
+ * @param {object} props
+ * @param {Function} props.onClick - クリックハンドラ
+ * @returns {JSX.Element} コメントボタン要素
+ */
+/**
+ * 投稿カードの「コメント」ボタンコンポーネント
+ * @param props ボタンプロパティ
+ * @param props.onClick
+ * @returns {JSX.Element} コメントボタン要素
+ */
+const PostCardCommentButton = ({
+  onClick,
+}: {
+  onClick: (e: React.MouseEvent) => void;
+}): JSX.Element => (
+  <PostCardActionButton active={false} onClick={onClick} icon="💬" label="コメント" />
+);
+
+/**
+ * シェアボタン
+ * @param {object} props
+ * @param {Function} props.onClick - クリックハンドラ
+ * @returns {JSX.Element} シェアボタン要素
+ */
+/**
+ * 投稿カードの「シェア」ボタンコンポーネント
+ * @param props ボタンプロパティ
+ * @param props.onClick
+ * @returns {JSX.Element} シェアボタン要素
+ */
+const PostCardShareButton = ({
+  onClick,
+}: {
+  onClick: (e: React.MouseEvent) => void;
+}): JSX.Element => (
+  <PostCardActionButton active={false} onClick={onClick} icon="🔄" label="シェア" />
+);
+
+/**
+ * アクションボタン
+ * @param {object} props
+ * @param {boolean} props.active - アクティブ状態
+ * @param {Function} props.onClick - クリックハンドラ
+ * @param {string} props.icon - アイコン
+ * @param {string} props.label - ラベル
+ * @returns {JSX.Element} アクションボタン要素
+ */
+/**
+ * 投稿カードのアクションボタンコンポーネント
+ * @param props アクションボタンプロパティ
+ * @param props.active
+ * @param props.onClick
+ * @param props.icon
+ * @param props.label
+ * @returns {JSX.Element} アクションボタン要素
+ */
+const PostCardActionButton = ({
+  active,
+  onClick,
+  icon,
+  label,
+}: {
+  active: boolean;
+  onClick: (e: React.MouseEvent) => void;
+  icon: string;
+  label: string;
+}): JSX.Element => (
+  <button
+    className={`flex-1 flex items-center justify-center py-1 ${active ? 'text-pink-500' : 'text-gray-500'} hover:bg-gray-50 rounded-md`}
+    onClick={onClick}
+  >
+    <span className="mr-1">{icon}</span>
+    <span>{label}</span>
+  </button>
+);
+
+export default PostCard;
